@@ -1,0 +1,8 @@
+icu:
+  uuid:
+    local-cache:
+        zk:
+          zk-address: 10.222.50.18:2181,10.222.50.19:2181,10.222.50.20:2181
+          system-code: uuid_demo
+        system-code: uuid_demo
+    system-code: uuid_demo
