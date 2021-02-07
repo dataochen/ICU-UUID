@@ -34,7 +34,7 @@ public class ZkUtil {
      * @param zkProperties
      * @return
      */
-    public static long getWorkerId(ZkProperties zkProperties) {
+    public static long getWorkerId(ZkProperties zkProperties) throws Exception {
         String zkAddress = zkProperties.getZkAddress();
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
         CuratorFramework client = CuratorFrameworkFactory.newClient(zkAddress, retryPolicy);
@@ -47,7 +47,7 @@ public class ZkUtil {
     /***
      * 获取workId
      */
-    private static long buildWorkId(CuratorFramework client, ZkProperties zkProperties) {
+    private static long buildWorkId(CuratorFramework client, ZkProperties zkProperties) throws Exception {
         long workerId;
         String systemCode = zkProperties.getSystemCode();
         String pathBase = BASE_PATH.replaceAll("\\{systemCode}", systemCode);
@@ -99,6 +99,7 @@ public class ZkUtil {
             return workerId;
         } catch (Exception e) {
             log.error("获取分布式WorkId异常", e);
+            throw e;
         } finally {
             // 构建成功后释放锁
             try {
@@ -107,7 +108,6 @@ public class ZkUtil {
                 log.warn("释放锁失败");
             }
         }
-        return -1;
     }
 
 }

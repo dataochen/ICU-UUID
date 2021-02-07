@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(IdConfigProperties.class)
 @ConditionalOnJava(value = JavaVersion.EIGHT)
-@ConditionalOnProperty(prefix = "id", name = {"enable"}, havingValue = "true")
-public class IdGenerator {
+@ConditionalOnProperty(prefix = "icu.uuid.",name = {"system-code"})
+public class IdGeneratorConfiguration {
     @Autowired
     private IdConfigProperties idConfigProperties;
 

@@ -21,14 +21,14 @@ public class ZkSnowFlake extends AbstractSnowFlakeImpl {
     private ZkProperties zkProperties;
 
 
-    public ZkSnowFlake(IdConfigProperties idConfigProperties) {
+    public ZkSnowFlake(IdConfigProperties idConfigProperties) throws Exception {
         this.idConfigProperties = idConfigProperties;
         SnowFlakeProperties snowFlake = idConfigProperties.getSnowFlake();
         this.zkProperties = snowFlake.getZk();
         init();
     }
 
-    private void init() {
+    private void init() throws Exception {
         workerId = ZkUtil.getWorkerId(zkProperties);
     }
 

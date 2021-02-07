@@ -26,7 +26,7 @@ public class RouteImpl {
      *todo 优化 策略模式
      * @return
      */
-    public IdGenerateInterface route(IdConfigProperties idConfigProperties) {
+    public IdGenerateInterface route(IdConfigProperties idConfigProperties) throws Exception {
         SnowFlakeProperties snowFlake = idConfigProperties.getSnowFlake();
         LocalCacheProperties localCache = idConfigProperties.getLocalCache();
         if (null != snowFlake) {

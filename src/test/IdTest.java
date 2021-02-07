@@ -8,7 +8,7 @@ import org.osicu.config.LocalCacheProperties;
  * @date: 2020/12/23 17:07
  */
 public class IdTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         IdConfigProperties idConfigProperties = new IdConfigProperties();
         idConfigProperties.setEnable(true);
         LocalCacheProperties localCacheProperties = new LocalCacheProperties();
@@ -17,13 +17,15 @@ public class IdTest {
         idConfigProperties.setLocalCache(localCacheProperties);
         IdGenerateClient idGenerateClient = new IdGenerateClient(idConfigProperties);
         idGenerateClient.init();
-        for (int i = 0; i <1000 ; i++) {
-            
-        try {
-            System.out.println(idGenerateClient.nextId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        for (int i = 0; i < 1000; i++) {
+
+            try {
+                System.out.println(idGenerateClient.nextId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
+
+
 }

@@ -35,7 +35,7 @@ public class IdGenerateClient {
     /**
      * 初始化
      */
-    public void init() throws IllegalArgumentException {
+    public void init() throws Exception {
 //        校验配置
         idConfigProperties.checkParam();
 //        2.路由算法

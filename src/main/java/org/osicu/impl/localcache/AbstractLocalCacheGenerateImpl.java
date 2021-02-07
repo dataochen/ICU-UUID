@@ -72,7 +72,11 @@ public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterf
             log.error("获取ID超时，超过3秒。");
             throw new RuntimeException("获取ID超时，超过3秒。");
         }
-        long id = getWorkerId() << 33 | poll;
+        long workerId = getWorkerId();
+        if (workerId < 0) {
+            throw new IllegalStateException("获取workerId失败");
+        }
+        long id = workerId << 33 | poll;
         return id + "";
     }
 

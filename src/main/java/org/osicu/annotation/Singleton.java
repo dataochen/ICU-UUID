@@ -1,10 +1,16 @@
 package org.osicu.annotation;
 
+import java.lang.annotation.*;
+
 /**
  * @author osicu
  * @Description
- * 声明必须为单例模式
+ * 单例模式标识
  * @date: 2021/2/7 16:42
  */
-public @interface Singleton {
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface Singleton  {
 }

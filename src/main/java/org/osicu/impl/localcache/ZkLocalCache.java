@@ -19,14 +19,14 @@ public class ZkLocalCache extends AbstractLocalCacheGenerateImpl {
     private ZkProperties zkProperties;
 
 
-    public ZkLocalCache(IdConfigProperties idConfigProperties) {
+    public ZkLocalCache(IdConfigProperties idConfigProperties) throws Exception {
         this.idConfigProperties = idConfigProperties;
         LocalCacheProperties localCache = idConfigProperties.getLocalCache();
         this.zkProperties = localCache.getZk();
         init();
     }
 
-    private void init() {
+    private void init() throws Exception {
         workerId = ZkUtil.getWorkerId(zkProperties);
     }
 

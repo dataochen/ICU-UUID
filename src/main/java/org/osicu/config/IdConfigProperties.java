@@ -33,6 +33,8 @@ public class IdConfigProperties {
     @NestedConfigurationProperty
     private LocalCacheProperties localCache;
 
+    private String systemCode;
+
     public SnowFlakeProperties getSnowFlake() {
         return snowFlake;
     }
@@ -55,6 +57,14 @@ public class IdConfigProperties {
 
     public void setLocalCache(LocalCacheProperties localCache) {
         this.localCache = localCache;
+    }
+
+    public String getSystemCode() {
+        return systemCode;
+    }
+
+    public void setSystemCode(String systemCode) {
+        this.systemCode = systemCode;
     }
 
     /**
