@@ -7,10 +7,10 @@ import java.lang.annotation.*;
  * @Description
  * 单例模式标识
  * @date: 2021/2/7 16:42
+ * @since 1.0
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
 @Documented
 public @interface Singleton  {
 }

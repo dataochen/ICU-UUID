@@ -1,32 +1,26 @@
 package org.osicu.config;
 
-import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
  * @author osicu
  * @Description
  * @date: 2020/12/1 17:41
  */
-public class DataCenterProperties {
+public class DataCenterProperties implements IdProperties{
+
     /**
-     * 127.0.0.2,127.0.0.3,127.0.0.1,10.13.145.149 逗号分隔
-     * 最大256台ip
+     * dataCenterIndex从0开始
      */
-    private String ips;
-    /**
-     * 如果有此配置 则使用 MultiDataCenterSnowFlake 生产id ;dataCenterIndex从0开始
-     * 最大4个数据中心
-     */
-    @Max(3)
+    @Min(0)
     private int dataCenterIndex;
+    /**
+     * 最大数据中心数
+     * 默认最大 4个数据中心
+     */
+    @Min(1)
+    private int maxDateCenterNum = 1 << 2;
 
-    public String getIps() {
-        return ips;
-    }
-
-    public void setIps(String ips) {
-        this.ips = ips;
-    }
 
     public int getDataCenterIndex() {
         return dataCenterIndex;
@@ -34,5 +28,21 @@ public class DataCenterProperties {
 
     public void setDataCenterIndex(int dataCenterIndex) {
         this.dataCenterIndex = dataCenterIndex;
+    }
+
+
+    public int getMaxDateCenterNum() {
+        return maxDateCenterNum;
+    }
+
+    public void setMaxDateCenterNum(int maxDateCenterNum) {
+        this.maxDateCenterNum = maxDateCenterNum;
+    }
+
+    @Override
+    public void checkProperties() throws IllegalArgumentException {
+        if (dataCenterIndex > maxDateCenterNum - 1) {
+            throw new IllegalArgumentException("数据中心超限，你可以扩充maxDateCenterNum属性或者检查下dataCenterIndex是否正确。");
+        }
     }
 }

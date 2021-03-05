@@ -9,7 +9,15 @@ public interface IdGenerateInterface {
     /**
      * 下一个id
      * @return
+     * @throws Exception
      */
     public String nextId() throws Exception;
+
+    /**
+     * 打印当前配置内容 ID生成的范围
+     * 最小ID，最大ID，ID位数
+     * 预估信息
+     */
+    public void printRange();
 
 }

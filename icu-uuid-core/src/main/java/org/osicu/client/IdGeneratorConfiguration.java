@@ -11,8 +11,9 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author osicu
- * @Description
+ * @Description jdk8以上
  * @date: 2020/12/1 20:20
+ * @since 1.0
  */
 @Configuration
 @EnableConfigurationProperties(IdConfigProperties.class)
@@ -24,7 +25,6 @@ public class IdGeneratorConfiguration {
 
     @Bean(initMethod = "init", destroyMethod = "destroy")
     public IdGenerateClient idGenerateClient() {
-        IdGenerateClient idGenerateClient = new IdGenerateClient(idConfigProperties);
-        return idGenerateClient;
+        return new IdGenerateClient(idConfigProperties);
     }
 }

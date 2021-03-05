@@ -1,6 +1,10 @@
 package org.osicu.config;
 
+import org.osicu.annotation.IpPortList;
+
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author osicu
@@ -9,21 +13,25 @@ import javax.validation.constraints.NotBlank;
  */
 public class ZkProperties {
     /**
-     * 必须配置ip:port,多个ip:port用逗号 , 分隔
-     * 例子：127.0.0.100:2181,127.0.0.101:2181
+     * 格式ip[:port],多个ip[:port]用逗号 , 分隔
+     * 例子：127.0.0.100:2181,127.0.0.101:2181,127.0.0.101,127.0.0.101:
+     * 如果没有端口号 默认80
+     * 支持去重和trim()
      */
     @NotBlank
+    @IpPortList
     private String zkAddress;
-    /**
-     * 系统唯一标示 隔离不通业务系统 单个系统内保证id不重复
-     */
-    @NotBlank
-    private String systemCode;
+
     /**
      * 锁超时时间
+     * 启动时 用于分布式锁 来获取唯一workId
+     * 单位：毫秒 {@link TimeUnit#MILLISECONDS}
      * 默认5秒
      */
-    private long lockTimeOut=5000;
+    @Min(1)
+    private long lockTimeOut=5*1000;
+
+
 
     public String getZkAddress() {
         return zkAddress;
@@ -31,14 +39,6 @@ public class ZkProperties {
 
     public void setZkAddress(String zkAddress) {
         this.zkAddress = zkAddress;
-    }
-
-    public String getSystemCode() {
-        return systemCode;
-    }
-
-    public void setSystemCode(String systemCode) {
-        this.systemCode = systemCode;
     }
 
     public long getLockTimeOut() {

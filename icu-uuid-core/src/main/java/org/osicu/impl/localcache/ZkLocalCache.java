@@ -22,12 +22,12 @@ public class ZkLocalCache extends AbstractLocalCacheGenerateImpl {
     public ZkLocalCache(IdConfigProperties idConfigProperties) throws Exception {
         this.idConfigProperties = idConfigProperties;
         LocalCacheProperties localCache = idConfigProperties.getLocalCache();
-        this.zkProperties = localCache.getZk();
+        this.zkProperties = localCache.getWorkIdStrategy().getZk();
         init();
     }
 
     private void init() throws Exception {
-        workerId = ZkUtil.getWorkerId(zkProperties);
+        workerId = ZkUtil.getWorkerId(zkProperties, idConfigProperties.getSystemCode());
     }
 
     @Override
@@ -36,8 +36,12 @@ public class ZkLocalCache extends AbstractLocalCacheGenerateImpl {
     }
 
     @Override
-    protected LocalCacheProperties getLocalCacheProperties() {
-        return idConfigProperties.getLocalCache();
+    protected IdConfigProperties getLocalCacheProperties() {
+        return idConfigProperties;
     }
 
+    @Override
+    public void printRange() {
+        // TODO: 2021/3/5
+    }
 }

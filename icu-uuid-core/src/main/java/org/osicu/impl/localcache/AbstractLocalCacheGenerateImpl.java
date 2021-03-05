@@ -1,6 +1,7 @@
 package org.osicu.impl.localcache;
 
 import org.osicu.IdGenerateInterface;
+import org.osicu.config.IdConfigProperties;
 import org.osicu.config.LocalCacheProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +30,19 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterface {
     private static final Logger log = LoggerFactory.getLogger(AbstractLocalCacheGenerateImpl.class);
-    private LocalCacheProperties localCacheProperties;
+    private IdConfigProperties idConfigProperties;
 
     private ArrayBlockingQueue<Long> arrayBlockingQueue = new ArrayBlockingQueue<Long>(1024);
     /**
      * 文件存储根目录
-     * todo 检查是否有写权限 没有启动抛异常；可支持自定义路径
+     * README 检查是否有写权限 没有启动抛异常；可支持自定义路径
      */
     private final String BASE_PATH_TABLE = "/export/Data/id/";
 
     @Override
     public String nextId() throws Exception {
-        if (null == localCacheProperties) {
-            localCacheProperties = getLocalCacheProperties();
+        if (null == idConfigProperties) {
+            idConfigProperties = getLocalCacheProperties();
         }
         try {
             return convertId();
@@ -58,7 +59,7 @@ public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterf
      */
     protected abstract long getWorkerId() throws Exception;
 
-    protected abstract LocalCacheProperties getLocalCacheProperties();
+    protected abstract IdConfigProperties getLocalCacheProperties();
 
 
     private synchronized String convertId() throws Exception {
@@ -84,7 +85,8 @@ public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterf
 //        查询当前系统 最大的id和步长
         IdTableCache idTableCache = fileParse();
         long maxNo = idTableCache.getMaxNo();
-        log.debug("{} maxNo={} stepNum={}", localCacheProperties.getSystemCode(), maxNo, localCacheProperties.getStepNum());
+        LocalCacheProperties localCacheProperties = idConfigProperties.getLocalCache();
+        log.debug("{} maxNo={} stepNum={}", idConfigProperties.getSystemCode(), maxNo, localCacheProperties.getStepNum());
         idTableCache.setMaxNo(maxNo + localCacheProperties.getStepNum());
 //        写磁盘
         writeFile(idTableCache);
@@ -101,17 +103,17 @@ public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterf
      */
     private IdTableCache fileParse() throws Exception {
         IdTableCache idTableCache = new IdTableCache();
-        File file = new File(BASE_PATH_TABLE + "idTable/" + localCacheProperties.getSystemCode());
+        File file = new File(BASE_PATH_TABLE + "idTable/" + idConfigProperties.getSystemCode());
         if (!file.exists()) {
 //                创建文件
-            log.info("初始化 {} idTable文件", localCacheProperties.getSystemCode());
+            log.info("初始化 {} idTable文件", idConfigProperties.getSystemCode());
             File fileParent = file.getParentFile();
             String fileParentPath = file.getParent();
             if (!fileParent.exists()) {
                 fileParent.mkdirs();
             }
             file.createNewFile();
-            idTableCache.setSystemCode(localCacheProperties.getSystemCode());
+            idTableCache.setSystemCode(idConfigProperties.getSystemCode());
             idTableCache.setMaxNo(0L);
             log.info("首次启动");
             return idTableCache;
@@ -133,10 +135,10 @@ public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterf
      * @throws Exception
      */
     private void writeFile(IdTableCache idTableCache) throws Exception {
-        File file = new File(BASE_PATH_TABLE + "idTable/" + localCacheProperties.getSystemCode());
+        File file = new File(BASE_PATH_TABLE + "idTable/" + idConfigProperties.getSystemCode());
         if (!file.exists()) {
 //                创建文件
-            log.info("初始化 {} idTable文件", localCacheProperties.getSystemCode());
+            log.info("初始化 {} idTable文件", idConfigProperties.getSystemCode());
             File fileParent = file.getParentFile();
             String fileParentPath = file.getParent();
             if (!fileParent.exists()) {
@@ -158,7 +160,8 @@ public abstract class AbstractLocalCacheGenerateImpl implements IdGenerateInterf
      */
     private boolean needNewIds() {
         int size = arrayBlockingQueue.size();
-        int thresholdValue = localCacheProperties.getThresholdValue();
-        return size <= thresholdValue;
+        LocalCacheProperties localCacheProperties = idConfigProperties.getLocalCache();
+        float thresholdValue = localCacheProperties.getThresholdValue();
+        return size <= localCacheProperties.getStepNum() * (1 - thresholdValue);
     }
 }

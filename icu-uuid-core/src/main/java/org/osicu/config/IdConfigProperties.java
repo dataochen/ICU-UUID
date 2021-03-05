@@ -1,38 +1,50 @@
 package org.osicu.config;
 
 import org.hibernate.validator.HibernateValidator;
+import org.osicu.validate.CheckIdUtil;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
+import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * @author osicu
- * @Description
+ * @Description * * todo 提供 计算ID范围的方法
  * @date: 2020/12/1 17:19
+ * @since 1.0
  */
 @ConfigurationProperties(prefix = "icu.uuid")
 @Component
 public class IdConfigProperties {
     /**
-     * 是否启动
+     * {@code snowFlake}和{@code localCache} 二选一
+     * 如果配置 {@code snowFlake} 则路由成通过雪花算法来生成
+     * 适用于长ID 推荐大于15时才使用
      */
-    private Boolean enable = true;
-
     @NestedConfigurationProperty
+    @Valid
     private SnowFlakeProperties snowFlake;
+    /**
+     * {@code snowFlake}和{@code localCache} 二选一
+     * {@code localCache} 则路由成通过本地缓存递增算法来生成
+     * 适用于短ID
+     */
     @NestedConfigurationProperty
+    @Valid
     private LocalCacheProperties localCache;
-
+    /**
+     * 系统标示 全局唯一  隔离不通业务系统 单个系统内保证id不重复
+     * 必填
+     */
+    @NotBlank
     private String systemCode;
 
     public SnowFlakeProperties getSnowFlake() {
@@ -41,14 +53,6 @@ public class IdConfigProperties {
 
     public void setSnowFlake(SnowFlakeProperties snowFlake) {
         this.snowFlake = snowFlake;
-    }
-
-    public Boolean getEnable() {
-        return enable;
-    }
-
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
     }
 
     public LocalCacheProperties getLocalCache() {
@@ -67,100 +71,24 @@ public class IdConfigProperties {
         this.systemCode = systemCode;
     }
 
-    /**
-     * 检查配置
-     *
-     * @throws IllegalArgumentException
-     */
+
     public void checkParam() throws IllegalArgumentException {
-        if (null != snowFlake) {
-            String ips = snowFlake.getIps();
-//                回写
-            snowFlake.setIps(checkIps(ips));
-            DataCenterProperties dataCenter = snowFlake.getDataCenter();
-            if (null != dataCenter) {
-                dataCenter.setIps(checkIps(dataCenter.getIps()));
-            }
-            ZkProperties zk = snowFlake.getZk();
-//            if (null != zk) {
-//                zk.setZkAddress(checkIpPorts(zk.getZkAddress()));
-//            }
-            check4Obj(snowFlake);
+//        validate注解 校验阶段
+        check4Obj(this);
+//        自定义注解校验阶段
+        CheckIdUtil.checkParam4Annotation(this);
+//        其他重要参数校验阶段
+        if (Objects.isNull(snowFlake) == Objects.isNull(localCache)) {
+            throw new IllegalArgumentException("snowFlake和localCache配置有且只能有一个");
         }
-        if (null != localCache) {
-            String ips = localCache.getIps();
-            localCache.setIps(checkIps(ips));
-            DataCenterProperties dataCenter = localCache.getDataCenter();
-            if (null != dataCenter) {
-                dataCenter.setIps(checkIps(dataCenter.getIps()));
-            }
-            ZkProperties zk = localCache.getZk();
-//            if (null != zk) {
-//                zk.setZkAddress(checkIpPorts(zk.getZkAddress()));
-//            }
-            check4Obj(localCache);
+        if (Objects.nonNull(snowFlake)) {
+            snowFlake.checkProperties();
+        }
+        if (Objects.nonNull(localCache)) {
+            localCache.checkProperties();
         }
     }
 
-    /**
-     * 校验ips
-     *
-     * @param ips
-     * @return
-     */
-    private String checkIps(String ips) {
-        if (StringUtils.isEmpty(ips)) {
-            return ips;
-        }
-        String[] split = ips.split(",");
-        LinkedHashSet<String> setIp = new LinkedHashSet<>();
-        setIp.addAll(Arrays.asList(split));
-//                过滤处理 trim
-        Set<String> collect = setIp.stream().map(String::trim).collect(Collectors.toSet());
-        checkIp(collect);
-        return String.join(",", collect);
-    }
-
-    /**
-     * 校验是否填的是ip
-     *
-     * @param ips
-     */
-    private void checkIp(Set<String> ips) {
-        String pattern = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
-        Pattern r = Pattern.compile(pattern);
-        boolean b = ips.stream().anyMatch(ip -> !"#".equals(ip) && !r.matcher(ip).matches());
-        if (b) {
-            throw new IllegalArgumentException("snowflake.ips配置的值格式不对；必须配置ip,多个ip用逗号 , 分隔");
-        }
-    }
-
-    private String checkIpPorts(String ipPorts) {
-        if (StringUtils.isEmpty(ipPorts)) {
-            return ipPorts;
-        }
-        String[] split = ipPorts.split(",");
-        LinkedHashSet<String> setIp = new LinkedHashSet<>();
-        setIp.addAll(Arrays.asList(split));
-//                过滤处理 trim
-        Set<String> collect = setIp.stream().map(String::trim).collect(Collectors.toSet());
-        checkIpPort(collect);
-        return String.join(",", collect);
-    }
-
-    /**
-     * 校验是否填的是ip:port
-     *
-     * @param ipPorts
-     */
-    private void checkIpPort(Set<String> ipPorts) {
-        String pattern = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}(:\\d+)";
-        Pattern r = Pattern.compile(pattern);
-        boolean b = ipPorts.stream().anyMatch(ip -> !r.matcher(ip).matches());
-        if (b) {
-            throw new IllegalArgumentException("snowFlake.zk.zkAddress 配置的值格式不对；必须配置ip:port,多个ip:port用逗号 , 分隔");
-        }
-    }
 
     /**
      * 使用hibernate的注解来进行验证

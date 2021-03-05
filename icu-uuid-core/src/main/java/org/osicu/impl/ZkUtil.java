@@ -34,12 +34,12 @@ public class ZkUtil {
      * @param zkProperties
      * @return
      */
-    public static long getWorkerId(ZkProperties zkProperties) throws Exception {
+    public static long getWorkerId(ZkProperties zkProperties,String systemCode) throws Exception {
         String zkAddress = zkProperties.getZkAddress();
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
         CuratorFramework client = CuratorFrameworkFactory.newClient(zkAddress, retryPolicy);
         client.start();
-        long w = buildWorkId(client, zkProperties);
+        long w = buildWorkId(client, zkProperties,systemCode);
         Runtime.getRuntime().addShutdownHook(new Thread(client::close));
         return w;
     }
@@ -47,9 +47,8 @@ public class ZkUtil {
     /***
      * 获取workId
      */
-    private static long buildWorkId(CuratorFramework client, ZkProperties zkProperties) throws Exception {
+    private static long buildWorkId(CuratorFramework client, ZkProperties zkProperties,String systemCode) throws Exception {
         long workerId;
-        String systemCode = zkProperties.getSystemCode();
         String pathBase = BASE_PATH.replaceAll("\\{systemCode}", systemCode);
 // lockPath,用于加锁，注意要与nodePath区分开
         final String lockPath = pathBase;

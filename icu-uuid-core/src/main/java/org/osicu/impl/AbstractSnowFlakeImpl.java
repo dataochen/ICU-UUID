@@ -22,7 +22,7 @@ import org.osicu.config.SnowFlakeProperties;
  * @date: 2020/11/3 15:23
  * @since 2020年12月22日17:22:42 已支持时间回拨 短时间回拨 直接阻塞等待
  * <p>
- * todo
+ * README
  * 1.各位置位数可配置化
  * 2.时钟回拨优化方案：（需要持久化机器时间，可以本地磁盘或zk记录）
  * 2.1 短时间回拨 直接阻塞等待
@@ -110,10 +110,6 @@ public abstract class AbstractSnowFlakeImpl implements IdGenerateInterface {
             }
         }
         long startTime = snowFlakeProperties.getStartTime();
-        if (0 == startTime) {
-            // TODO: 2021/2/7 默认时间优化
-            startTime = 1606216408000L;
-        }
         long l = currentTimeMillis - startTime;
         if (l > Math.pow(2, 37)) {
             throw new IllegalArgumentException("时间超限了,只能用17年，注意你配置的开始时间");
@@ -123,7 +119,8 @@ public abstract class AbstractSnowFlakeImpl implements IdGenerateInterface {
 
     }
 
-    private void checkTimeBack() {
-
+    @Override
+    public void printRange() {
+        // TODO: 2021/3/5  
     }
 }

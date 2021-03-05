@@ -1,44 +1,23 @@
 package org.osicu.config;
 
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author osicu
- * @Description 配置
+ * @Description 本地缓存实现ID
  * @date: 2020/12/1 17:25
  */
-public class LocalCacheProperties {
+public class LocalCacheProperties extends IdPropertiesImpl {
     /**
-     * 如果有此配置 则使用
-     * <p>
-     * 例子：127.0.0.2,127.0.0.3,127.0.0.1,10.13.145.149 逗号分隔
-     */
-    private String ips;
-    /**
-     * 如果有此配置 则使用
-     */
-    @NestedConfigurationProperty
-    private DataCenterProperties dataCenter;
-    /**
-     * 如果有此配置 则使用
-     */
-    @NestedConfigurationProperty
-    private ZkProperties zk;
-    /**
-     * 阈值
+     * 阈值 负载
      * 剩余ID低于此阈值数量 生成新的一批ID
-     * 默认低于50个ID时 继续获取
+     * 默认低于25%步长ID时 继续获取
+     * 例子：如果步长是100 那么当{@code org.osicu.impl.localcache.AbstractLocalCacheGenerateImpl#arrayBlockingQueue}剩余ID
+     * 不足25时，生成新的一批ID
      */
-    private int ThresholdValue = 50;
-    /**
-     * 系统唯一标示 隔离不通业务系统 单个系统内保证id不重复
-     */
-    @NotBlank
-    private String systemCode;
+    private float thresholdValue = 0.75F;
+
     /**
      * 步长
      * 默认100
@@ -47,45 +26,13 @@ public class LocalCacheProperties {
     @Min(value = 100)
     private int stepNum = 100;
 
-    public String getIps() {
-        return ips;
+
+    public float getThresholdValue() {
+        return thresholdValue;
     }
 
-    public void setIps(String ips) {
-        this.ips = ips;
-    }
-
-    public DataCenterProperties getDataCenter() {
-        return dataCenter;
-    }
-
-    public void setDataCenter(DataCenterProperties dataCenter) {
-        this.dataCenter = dataCenter;
-    }
-
-    public ZkProperties getZk() {
-        return zk;
-    }
-
-    public void setZk(ZkProperties zk) {
-        this.zk = zk;
-    }
-
-
-    public int getThresholdValue() {
-        return ThresholdValue;
-    }
-
-    public void setThresholdValue(int thresholdValue) {
-        ThresholdValue = thresholdValue;
-    }
-
-    public String getSystemCode() {
-        return systemCode;
-    }
-
-    public void setSystemCode(String systemCode) {
-        this.systemCode = systemCode;
+    public void setThresholdValue(float thresholdValue) {
+        this.thresholdValue = thresholdValue;
     }
 
     public int getStepNum() {
@@ -94,5 +41,14 @@ public class LocalCacheProperties {
 
     public void setStepNum(int stepNum) {
         this.stepNum = stepNum;
+    }
+
+    @Override
+    public void checkProperties() throws IllegalArgumentException {
+        if (thresholdValue <= 0 || thresholdValue >= 1) {
+            throw new IllegalArgumentException("thresholdValue 应该在0-1之前 不包含0和1");
+        }
+        super.checkProperties();
+
     }
 }
