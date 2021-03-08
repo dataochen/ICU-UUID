@@ -17,6 +17,22 @@ public class CommonUtil {
         n |= n >>> 8;
         n |= n >>> 16;
         int i = (n < 0) ? 1 : n + 1;
+       System.out.println(i);
         return (int) (Math.log(i) / Math.log(2));
+    }
+    public static  int bitUp(long num) {
+        long n = num - 1;
+        n |= n >>> 1;
+        n |= n >>> 2;
+        n |= n >>> 4;
+        n |= n >>> 8;
+        n |= n >>> 16;
+        n |= n >>> 32;
+        long i = (n < 0) ? 1 : n + 1;
+        return (int) (Math.log(i) / Math.log(2));
+    }
+
+    public static void main(String[] args) {
+        System.out.println(bitUp(2));
     }
 }

@@ -21,8 +21,8 @@ public class DemoTest {
     @Test
     public void nextId() throws Exception {
         for (int i = 0; i < 10; i++) {
-            String s = idGenerateClient.nextId();
-            System.out.println(s);
+            long l = idGenerateClient.nextId();
+            System.out.println(l);
         }
     }
 }

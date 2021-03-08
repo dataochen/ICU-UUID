@@ -7,6 +7,8 @@ import org.osicu.config.SnowFlakeProperties;
 import org.osicu.impl.LocalCacheImpl;
 import org.osicu.impl.SnowFlakeImpl;
 
+import java.util.Objects;
+
 /**
  * @author osicu
  * @Description
@@ -26,11 +28,19 @@ public class IdGenerateFactory {
     public IdGenerateInterface getBean(IdConfigProperties idConfigProperties) throws Exception {
         SnowFlakeProperties snowFlake = idConfigProperties.getSnowFlake();
         LocalCacheProperties localCache = idConfigProperties.getLocalCache();
-        if (null != snowFlake) {
+        if (Objects.nonNull(snowFlake)) {
             return new SnowFlakeImpl(snowFlake, idConfigProperties.getSystemCode());
-        } else if (null != localCache) {
+        } else if (Objects.nonNull(localCache)) {
             return new LocalCacheImpl(localCache, idConfigProperties.getSystemCode());
         }
         throw new IllegalArgumentException("没有路由到相应实现,本期只支持本地缓存算法和雪花算法生成ID。");
+    }
+
+    /**
+     * 工厂
+     * @return
+     */
+    public static IdGenerateFactory newInstance() {
+        return new IdGenerateFactory();
     }
 }

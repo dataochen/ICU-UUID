@@ -1,7 +1,6 @@
 package org.osicu.config;
 
-import org.osicu.impl.ZkUtil;
-import org.osicu.impl.localcache.DefaultLocalCache;
+import org.osicu.impl.AbstractWorkerId;
 
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -9,12 +8,13 @@ import java.util.Objects;
 /**
  * @author chendatao
  */
-public class IdPropertiesImpl implements IdProperties {
+public class IdPropertiesBean implements IdProperties {
     /**
      * 获取workId的策略
+     * 参考{@link AbstractWorkerId#getWorkerId(org.osicu.config.IdPropertiesBean, java.lang.String)}
      * <ul>
-     *     <li>ip:配置所有ip,在系统启动时获取ip的下标作为全局唯一workId 参考{@link DefaultLocalCache#getWorkerId()}</li>
-     *     <li>zk:通过zk锁获取全局唯一workId 参考{@link ZkUtil#getWorkerId(org.osicu.config.ZkProperties)}</li>
+     *     <li>ip:配置所有ip,在系统启动时获取ip的下标作为全局唯一workId </li>
+     *     <li>zk:通过zk锁获取全局唯一workId </li>
      * </ul>
      */
     @NotNull

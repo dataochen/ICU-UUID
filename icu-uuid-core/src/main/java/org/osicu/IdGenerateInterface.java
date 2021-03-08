@@ -11,7 +11,7 @@ public interface IdGenerateInterface {
      * @return
      * @throws Exception
      */
-    public String nextId() throws Exception;
+    public long nextId() throws Exception;
 
     /**
      * 打印当前配置内容 ID生成的范围

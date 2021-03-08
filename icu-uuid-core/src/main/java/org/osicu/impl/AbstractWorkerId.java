@@ -1,7 +1,7 @@
 package org.osicu.impl;
 
 import org.osicu.config.DataCenterProperties;
-import org.osicu.config.IdPropertiesImpl;
+import org.osicu.config.IdPropertiesBean;
 import org.osicu.config.Ips;
 import org.osicu.config.WorkIdStrategy;
 import org.osicu.route.CommonUtil;
@@ -18,12 +18,12 @@ import java.util.Objects;
  * workerId 获取策略
  *
  * @author chendatao
+ * @since 1.0
  */
 public abstract class AbstractWorkerId implements WorkerIdInterface {
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractWorkerId.class);
-//    -------------- 私有 -------------
     /**
-     * todo
+     * 缓存workerId
      */
     private Long workerIdCache;
     private static String localIp;
@@ -36,19 +36,12 @@ public abstract class AbstractWorkerId implements WorkerIdInterface {
         }
     }
 
-    /**
-     * 上下文
-     */
-    abstract IdPropertiesImpl convertIdPropertiesImpl();
-    abstract String convertSystemCode();
 
     @Override
-    public long getWorkerId() throws Exception {
+    public long getWorkerId(IdPropertiesBean idProperties, String systemCode) throws Exception {
         if (Objects.nonNull(workerIdCache)) {
             return workerIdCache;
         }
-        IdPropertiesImpl   idProperties = convertIdPropertiesImpl();
-        String  systemCode = convertSystemCode();
         WorkIdStrategy workIdStrategy = idProperties.getWorkIdStrategy();
         if (Objects.nonNull(workIdStrategy.getIps())) {
             Ips ips = workIdStrategy.getIps();
@@ -61,25 +54,26 @@ public abstract class AbstractWorkerId implements WorkerIdInterface {
                     if (Objects.nonNull(dataCenterProperties)) {
                         int dataCenterIndex = dataCenterProperties.getDataCenterIndex();
                         LOGGER.info("ID生成器启动，数据中心：{}", dataCenterIndex);
-                        workerIdCache = dataCenterIndex << CommonUtil.bitUp(workIdStrategy.getMaxIpNum()) | workerIdCache;
+                        workerIdCache = dataCenterIndex << CommonUtil.bitUp(workIdStrategy.getMaxWorkerIdNum()) | workerIdCache;
                     }
                     return workerIdCache;
                 }
             }
-            throw new IllegalArgumentException("没有找到ip");
+            throw new IllegalArgumentException("没有在配置中找到ip" + localIp + "，请检查配置是否正确。");
         } else if (Objects.nonNull(workIdStrategy.getZk())) {
-            workerIdCache = ZkUtil.getWorkerId(workIdStrategy.getZk(), systemCode);
-            if (workerIdCache > workIdStrategy.getMaxIpNum()) {
+            workerIdCache = ZkUtil.newInstance(workIdStrategy.getZk().getZkAddress()).buildWorkId(workIdStrategy.getZk().getLockTimeOut(), systemCode, workIdStrategy.getMaxWorkerIdNum());
+            if (workerIdCache > workIdStrategy.getMaxWorkerIdNum()) {
                 throw new IllegalArgumentException("zk获取的workId超过最大限制");
             }
             DataCenterProperties dataCenterProperties = idProperties.getDataCenterProperties();
             if (Objects.nonNull(dataCenterProperties)) {
                 int dataCenterIndex = dataCenterProperties.getDataCenterIndex();
                 LOGGER.info("ID生成器启动，数据中心：{}", dataCenterIndex);
-                workerIdCache = dataCenterIndex << CommonUtil.bitUp(workIdStrategy.getMaxIpNum()) | workerIdCache;
+                workerIdCache = dataCenterIndex << CommonUtil.bitUp(workIdStrategy.getMaxWorkerIdNum()) | workerIdCache;
             }
 
         }
+        // TODO: 2021/3/8 自定义 workerId 实现逻辑
         throw new IllegalArgumentException("不合法的workerId策略");
     }
 }

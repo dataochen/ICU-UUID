@@ -26,9 +26,9 @@ public class IdGenerateClient {
      */
     private  volatile int status;
 
-    public String nextId() throws Exception {
+    public long nextId() throws Exception {
         if (status == 0) {
-            throw new Exception("id生成器未成功启动，状态为不可用");
+            throw new Exception("id生成器未成功启动，状态为不可用，请检查相应配置和日志。");
         }
         return idGenerateInterface.nextId();
     }
@@ -40,8 +40,7 @@ public class IdGenerateClient {
 //        校验配置
         idConfigProperties.checkParam();
 //        2.路由算法
-        IdGenerateFactory factory = new IdGenerateFactory();
-        idGenerateInterface = factory.getBean(idConfigProperties);
+        idGenerateInterface = IdGenerateFactory.newInstance().getBean(idConfigProperties);
         status = 1;
     }
 
