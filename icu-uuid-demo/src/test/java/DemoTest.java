@@ -25,4 +25,9 @@ public class DemoTest {
             System.out.println(l);
         }
     }
+
+    @Test
+    public void printRange() {
+        idGenerateClient.printRange();
+    }
 }

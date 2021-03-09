@@ -43,6 +43,7 @@ public abstract class AbstractWorkerId implements WorkerIdInterface {
             return workerIdCache;
         }
         WorkIdStrategy workIdStrategy = idProperties.getWorkIdStrategy();
+        // TODO: 2021/3/8 扩展接口 自定义获取workerId方式
         if (Objects.nonNull(workIdStrategy.getIps())) {
             Ips ips = workIdStrategy.getIps();
             String[] split = ips.getValue().split(",");

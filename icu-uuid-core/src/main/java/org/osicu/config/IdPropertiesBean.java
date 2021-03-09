@@ -1,6 +1,7 @@
 package org.osicu.config;
 
 import org.osicu.impl.AbstractWorkerId;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -18,12 +19,14 @@ public class IdPropertiesBean implements IdProperties {
      * </ul>
      */
     @NotNull
+    @NestedConfigurationProperty
     private WorkIdStrategy workIdStrategy;
     /**
      * 数据中心
      * 可空
      *
      */
+    @NestedConfigurationProperty
     private DataCenterProperties dataCenterProperties;
 
 

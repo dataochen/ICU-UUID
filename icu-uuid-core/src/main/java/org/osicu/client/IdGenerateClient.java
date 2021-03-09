@@ -33,6 +33,9 @@ public class IdGenerateClient {
         return idGenerateInterface.nextId();
     }
 
+    public void printRange() {
+        idGenerateInterface.printRange();
+    }
     /**
      * 初始化
      */

@@ -28,6 +28,7 @@ public class IdGenerateFactory {
     public IdGenerateInterface getBean(IdConfigProperties idConfigProperties) throws Exception {
         SnowFlakeProperties snowFlake = idConfigProperties.getSnowFlake();
         LocalCacheProperties localCache = idConfigProperties.getLocalCache();
+        // TODO: 2021/3/8 路由扩展接口 扩展自定义的序列号生成方式
         if (Objects.nonNull(snowFlake)) {
             return new SnowFlakeImpl(snowFlake, idConfigProperties.getSystemCode());
         } else if (Objects.nonNull(localCache)) {

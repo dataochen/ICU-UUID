@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,6 +47,11 @@ public class IdConfigProperties {
      */
     @NotBlank
     private String systemCode;
+    /**
+     * 扩展属性
+     * 用户可以根据自己的需要 进行扩展
+     */
+    private Map<Object, Object> attributeMap;
 
     public SnowFlakeProperties getSnowFlake() {
         return snowFlake;
@@ -87,6 +93,7 @@ public class IdConfigProperties {
         if (Objects.nonNull(localCache)) {
             localCache.checkProperties();
         }
+//        todo 扩展属性校验 扩展接口
     }
 
 

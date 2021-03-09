@@ -1,5 +1,6 @@
 package org.osicu.config;
 
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Min;
@@ -19,6 +20,7 @@ public class WorkIdStrategy implements IdProperties {
     /**
      * zookeeper的配置
      */
+    @NestedConfigurationProperty
     private ZkProperties zk;
     /**
      * 最大机器数
