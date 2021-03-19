@@ -6,6 +6,8 @@ import org.osicu.config.LocalCacheProperties;
 import org.osicu.config.SnowFlakeProperties;
 import org.osicu.impl.LocalCacheImpl;
 import org.osicu.impl.SnowFlakeImpl;
+import org.osicu.spi.IdGenerateWrapInterface;
+import org.osicu.spi.SpiFactory;
 
 import java.util.Objects;
 
@@ -28,17 +30,23 @@ public class IdGenerateFactory {
     public IdGenerateInterface getBean(IdConfigProperties idConfigProperties) throws Exception {
         SnowFlakeProperties snowFlake = idConfigProperties.getSnowFlake();
         LocalCacheProperties localCache = idConfigProperties.getLocalCache();
-        // TODO: 2021/3/8 路由扩展接口 扩展自定义的序列号生成方式
+        //  2021/3/8 路由扩展接口 扩展自定义的序列号生成方式
+        IdGenerateWrapInterface idGenerateWrapInterface = SpiFactory.getObject(IdGenerateWrapInterface.class);
+        if (Objects.nonNull(idGenerateWrapInterface)) {
+            idGenerateWrapInterface.setIdConfigProperties(idConfigProperties);
+            return idGenerateWrapInterface;
+        }
         if (Objects.nonNull(snowFlake)) {
-            return new SnowFlakeImpl(snowFlake, idConfigProperties.getSystemCode());
+            return SnowFlakeImpl.newInstance(idConfigProperties);
         } else if (Objects.nonNull(localCache)) {
-            return new LocalCacheImpl(localCache, idConfigProperties.getSystemCode());
+            return LocalCacheImpl.newInstance(idConfigProperties);
         }
         throw new IllegalArgumentException("没有路由到相应实现,本期只支持本地缓存算法和雪花算法生成ID。");
     }
 
     /**
      * 工厂
+     *
      * @return
      */
     public static IdGenerateFactory newInstance() {

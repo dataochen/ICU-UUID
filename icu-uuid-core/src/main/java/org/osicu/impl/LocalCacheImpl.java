@@ -1,9 +1,10 @@
 package org.osicu.impl;
 
-import org.osicu.IdGenerateInterface;
+import org.osicu.config.IdConfigProperties;
 import org.osicu.config.LocalCacheProperties;
 import org.osicu.impl.localcache.IdTableCache;
 import org.osicu.route.CommonUtil;
+import org.osicu.spi.IdGenerateWrapInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,18 +16,14 @@ import java.util.concurrent.TimeUnit;
  * @author chendatao
  * @since 1.0
  */
-public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateInterface {
+public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapInterface {
     private final static Logger log = LoggerFactory.getLogger(LocalCacheImpl.class);
 
-    public LocalCacheImpl(LocalCacheProperties localCache, String systemCode) {
-        this.localCacheProperties = localCache;
-        this.systemCode = systemCode;
+    public static LocalCacheImpl newInstance(IdConfigProperties idConfigProperties) {
+        LocalCacheImpl localCache = new LocalCacheImpl();
+        localCache.setIdConfigProperties(idConfigProperties);
+        return localCache;
     }
-
-    private LocalCacheImpl() {
-
-    }
-
     private LocalCacheProperties localCacheProperties;
     private String systemCode;
     /**
@@ -170,4 +167,14 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateInterf
         System.out.println(s);
     }
 
+    @Override
+    public void setIdConfigProperties(IdConfigProperties idConfigProperties) {
+        this.localCacheProperties = idConfigProperties.getLocalCache();
+        this.systemCode = idConfigProperties.getSystemCode();
+    }
+
+    @Override
+    public void checkParam() {
+
+    }
 }

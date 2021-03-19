@@ -1,1 +1,8 @@
- sna
+icu:
+  uuid:
+    snow-flake:
+      start-time: 0
+      work-id-strategy:
+        zk:
+          zk-address: 12
+    system-code: 

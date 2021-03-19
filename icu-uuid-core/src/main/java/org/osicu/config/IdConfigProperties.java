@@ -93,7 +93,6 @@ public class IdConfigProperties {
         if (Objects.nonNull(localCache)) {
             localCache.checkProperties();
         }
-//        todo 扩展属性校验 扩展接口
     }
 
 

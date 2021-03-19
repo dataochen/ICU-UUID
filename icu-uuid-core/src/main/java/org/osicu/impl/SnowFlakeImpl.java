@@ -1,24 +1,22 @@
 package org.osicu.impl;
 
-import org.osicu.IdGenerateInterface;
+import org.osicu.config.IdConfigProperties;
 import org.osicu.config.SnowFlakeProperties;
 import org.osicu.route.CommonUtil;
+import org.osicu.spi.IdGenerateWrapInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author chendatao
  */
-public class SnowFlakeImpl extends AbstractWorkerId implements IdGenerateInterface {
+public class SnowFlakeImpl extends AbstractWorkerId implements IdGenerateWrapInterface {
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowFlakeImpl.class);
 
-    private SnowFlakeImpl() {
-
-    }
-
-    public SnowFlakeImpl(SnowFlakeProperties snowFlakeProperties, String systemCode) {
-        this.snowFlakeProperties = snowFlakeProperties;
-        this.systemCode = systemCode;
+    public static SnowFlakeImpl newInstance(IdConfigProperties idConfigProperties) {
+        SnowFlakeImpl snowFlake = new SnowFlakeImpl();
+        snowFlake.setIdConfigProperties(idConfigProperties);
+        return snowFlake;
     }
 
     private SnowFlakeProperties snowFlakeProperties;
@@ -93,5 +91,16 @@ public class SnowFlakeImpl extends AbstractWorkerId implements IdGenerateInterfa
         return l << (CommonUtil.bitUp(snowFlakeProperties.getMaxTpsNum()) + CommonUtil.bitUp(snowFlakeProperties.getWorkIdStrategy().getMaxWorkerIdNum()))
                 | workerId << CommonUtil.bitUp(snowFlakeProperties.getMaxTpsNum())
                 | sequence;
+    }
+
+    @Override
+    public void setIdConfigProperties(IdConfigProperties idConfigProperties) {
+        this.snowFlakeProperties = idConfigProperties.getSnowFlake();
+        this.systemCode = idConfigProperties.getSystemCode();
+    }
+
+    @Override
+    public void checkParam() {
+
     }
 }
