@@ -21,10 +21,13 @@ public class DemoTest {
 
     @Test
     public void nextId() throws Exception {
-        for (int i = 0; i < 10; i++) {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 100; i++) {
             long l = idGenerateClient.nextId();
             System.out.println(l);
         }
+        long end = System.currentTimeMillis();
+        System.out.println("============cost"+(end-start));
     }
 
     @Test

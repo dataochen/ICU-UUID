@@ -1,6 +1,16 @@
+#icu:
+#  uuid:
+#    local-cache:
+#      stepNum: 1000
+#      work-id-strategy:
+#        maxWorkerIdNum: 2
+#        ips:
+#          value: 10.13.144.110
+#    system-code: demo
 icu:
   uuid:
-    local-cache:
+    snow-flake:
+      maxTpsNum: 10
       work-id-strategy:
         maxWorkerIdNum: 2
         ips:

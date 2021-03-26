@@ -78,6 +78,7 @@ public class SnowFlakeImpl extends AbstractWorkerId implements IdGenerateWrapInt
         }
         //  2021/3/8 单位时间内 支持多少个ID序列号
         if (sequence >= snowFlakeProperties.getMaxTpsNum()) {
+            LOGGER.info("单位时间内获取ID已到限制，等待下一秒。");
 //            等待下一秒
             while (true) {
                 long nextTimeMillis = System.currentTimeMillis() / 1000;
@@ -90,7 +91,7 @@ public class SnowFlakeImpl extends AbstractWorkerId implements IdGenerateWrapInt
             }
         }
         long startTime = snowFlakeProperties.getStartTime();
-        long l = currentTimeMillis - startTime;
+        long l = currentTimeMillis - startTime/1000;
         return l << (CommonUtil.bitUp(snowFlakeProperties.getMaxTpsNum()) + CommonUtil.bitUp(snowFlakeProperties.getWorkIdStrategy().getMaxWorkerIdNum()))
                 | workerId << CommonUtil.bitUp(snowFlakeProperties.getMaxTpsNum())
                 | sequence;

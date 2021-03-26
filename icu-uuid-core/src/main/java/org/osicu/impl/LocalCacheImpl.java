@@ -60,14 +60,14 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
     private synchronized long convertId() throws Exception {
         if (needNewIds()) {
             log.debug("ID不充足，生成新的一批IDS");
-//            next-v 可以异步生成新ID
-            ThreadUtil.executeAsync(() -> {
-                try {
                     generateIdList();
-                } catch (Exception e) {
-                    log.error("异步生成ID失败，请检查配置，e={}", e);
-                }
-            });
+////            next-v 可以异步生成新ID
+//            ThreadUtil.executeAsync(() -> {
+//                try {
+//                } catch (Exception e) {
+//                    log.error("异步生成ID失败，请检查配置，e={}", e);
+//                }
+//            });
         }
         Long poll = arrayBlockingQueue.poll(3000, TimeUnit.MILLISECONDS);
         if (null == poll) {
@@ -123,8 +123,10 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
             return idTableCache;
         }
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            idTableCache.setSystemCode(br.readLine().split(":")[1]);
-            idTableCache.setMaxNo(Long.valueOf(br.readLine().split(":")[1]));
+            String systemCode = br.readLine();
+            String maxNo = br.readLine();
+            idTableCache.setSystemCode(systemCode.split(":")[1]);
+            idTableCache.setMaxNo(Long.valueOf(maxNo.split(":")[1]));
             return idTableCache;
         }
     }
@@ -149,6 +151,7 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
             }
             file.createNewFile();
         }
+        log.info("回写磁盘");
         try (BufferedWriter br = new BufferedWriter(new FileWriter(file))) {
             br.write("systemCode:" + idTableCache.getSystemCode() + "\n");
             br.write("maxNo:" + idTableCache.getMaxNo() + "\n");
