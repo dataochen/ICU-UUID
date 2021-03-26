@@ -36,14 +36,15 @@ public class DemoTest {
     @Test
     public void concurrencyNextId() throws InterruptedException {
         long start = System.currentTimeMillis();
-        int total = 1000000;
-        CountDownLatch countDownLatch = new CountDownLatch(3);
-        for (int i = 0; i < 3; i++) {
+        int total = 1000000;int threadNum=2;
+        CountDownLatch countDownLatch = new CountDownLatch(threadNum);
+        for (int i = 0; i < threadNum; i++) {
             ThreadUtil.executeAsync(() -> {
                 long l = 0;
                 try {
-                    while (l < total / 10) {
-                        idGenerateClient.nextId();
+                    while (l < total / threadNum) {
+                        long l1 = idGenerateClient.nextId();
+                        System.out.println(l1);
                         l++;
                     }
                     countDownLatch.countDown();
@@ -55,6 +56,7 @@ public class DemoTest {
         }
         countDownLatch.await();
         long end = System.currentTimeMillis();
+        Thread.sleep(1000);
         System.out.println("==========cost " + (end - start));
     }
 

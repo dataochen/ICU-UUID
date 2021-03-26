@@ -12,14 +12,6 @@ import javax.validation.constraints.Pattern;
  * @date: 2020/12/1 17:25
  */
 public class LocalCacheProperties extends IdPropertiesBean {
-    /**
-     * 阈值 负载
-     * 剩余ID低于此阈值数量 生成新的一批ID
-     * 默认低于25%步长ID时 继续获取
-     * 例子：如果步长是100 那么当{@code org.osicu.impl.localcache.AbstractLocalCacheGenerateImpl#arrayBlockingQueue}剩余ID
-     * 不足25时，生成新的一批ID
-     */
-    private float thresholdValue = 0.75F;
 
     /**
      * 步长
@@ -51,13 +43,6 @@ public class LocalCacheProperties extends IdPropertiesBean {
         this.basePath = basePath;
     }
 
-    public float getThresholdValue() {
-        return thresholdValue;
-    }
-
-    public void setThresholdValue(float thresholdValue) {
-        this.thresholdValue = thresholdValue;
-    }
 
     public int getStepNum() {
         return stepNum;
@@ -77,9 +62,6 @@ public class LocalCacheProperties extends IdPropertiesBean {
 
     @Override
     public void checkProperties() throws IllegalArgumentException {
-        if (thresholdValue <= 0 || thresholdValue >= 1) {
-            throw new IllegalArgumentException("thresholdValue 应该在0-1之前 不包含0和1");
-        }
         int maxWorkerIdNum = getWorkIdStrategy().getMaxWorkerIdNum();
 //        everyMaxNo+maxWorkerIdNum 是否超过Long类型的限制
         long maxNo = maxWorkerIdNum << CommonUtil.bitUp(everyMaxNo) | everyMaxNo;

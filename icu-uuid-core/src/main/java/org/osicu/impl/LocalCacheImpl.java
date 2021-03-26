@@ -22,10 +22,18 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
     public static LocalCacheImpl newInstance(IdConfigProperties idConfigProperties) {
         LocalCacheImpl localCache = new LocalCacheImpl();
         localCache.setIdConfigProperties(idConfigProperties);
-
+//        启动异步生产者 生产ID
+        ThreadUtil.executeAsync(() -> {
+            try {
+                localCache.generateIdList();
+            } catch (Exception e) {
+                log.error("异步生成ID失败，请检查配置，e={}", e);
+            }
+        });
 
         return localCache;
     }
+
     private LocalCacheProperties localCacheProperties;
     private String systemCode;
 
@@ -57,25 +65,13 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
      * @return
      * @throws Exception
      */
-    private synchronized long convertId() throws Exception {
-        if (needNewIds()) {
-            log.debug("ID不充足，生成新的一批IDS");
-                    generateIdList();
-////            next-v 可以异步生成新ID
-//            ThreadUtil.executeAsync(() -> {
-//                try {
-//                } catch (Exception e) {
-//                    log.error("异步生成ID失败，请检查配置，e={}", e);
-//                }
-//            });
-        }
+    private  long convertId() throws Exception {
         Long poll = arrayBlockingQueue.poll(3000, TimeUnit.MILLISECONDS);
         if (null == poll) {
             log.error("获取ID超时，超过3秒。");
             throw new RuntimeException("获取ID超时，超过3秒。");
         }
         long workerId = getWorkerId(localCacheProperties, systemCode);
-        ;
         if (workerId < 0) {
             throw new IllegalStateException("获取workerId失败");
         }
@@ -90,7 +86,7 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
 //        查询当前系统 最大的id和步长
         IdTableCache idTableCache = fileParse();
         long maxNo = idTableCache.getMaxNo();
-        log.debug("{} maxNo={} stepNum={}", systemCode, maxNo, localCacheProperties.getStepNum());
+        log.info("{} maxNo={} stepNum={}", systemCode, maxNo, localCacheProperties.getStepNum());
         idTableCache.setMaxNo(maxNo + localCacheProperties.getStepNum());
 //        写磁盘
         writeFile(idTableCache);
@@ -98,6 +94,9 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
         for (int i = 0; i < localCacheProperties.getStepNum(); i++) {
             arrayBlockingQueue.put(maxNo + i + 1);
         }
+        log.info("生产完一批 继续下一批");
+//        递归执行生产
+        generateIdList();
     }
 
     /**
@@ -159,14 +158,6 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
         }
     }
 
-    /**
-     * 是否需要创建新ID
-     *
-     * @return
-     */
-    private boolean needNewIds() {
-        return arrayBlockingQueue.size() <= localCacheProperties.getStepNum() * (1 - localCacheProperties.getThresholdValue());
-    }
 
     @Override
     public void setIdConfigProperties(IdConfigProperties idConfigProperties) {
