@@ -37,12 +37,12 @@ public class DemoTest {
     public void concurrencyNextId() throws InterruptedException {
         long start = System.currentTimeMillis();
         int total = 1000000;
-        CountDownLatch countDownLatch = new CountDownLatch(3);
-        for (int i = 0; i < 3; i++) {
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        for (int i = 0; i < 2; i++) {
             ThreadUtil.executeAsync(() -> {
                 long l = 0;
                 try {
-                    while (l < total / 10) {
+                    while (l < total / 2) {
                         idGenerateClient.nextId();
                         l++;
                     }
