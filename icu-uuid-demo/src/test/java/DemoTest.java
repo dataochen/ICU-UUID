@@ -3,9 +3,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osicu.Application;
 import org.osicu.client.IdGenerateClient;
+import org.osicu.impl.ThreadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author dataochen
@@ -27,7 +30,32 @@ public class DemoTest {
             System.out.println(l);
         }
         long end = System.currentTimeMillis();
-        System.out.println("============cost"+(end-start));
+        System.out.println("============cost" + (end - start));
+    }
+
+    @Test
+    public void concurrencyNextId() throws InterruptedException {
+        long start = System.currentTimeMillis();
+        int total = 1000000;
+        CountDownLatch countDownLatch = new CountDownLatch(3);
+        for (int i = 0; i < 3; i++) {
+            ThreadUtil.executeAsync(() -> {
+                long l = 0;
+                try {
+                    while (l < total / 10) {
+                        idGenerateClient.nextId();
+                        l++;
+                    }
+                    countDownLatch.countDown();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        countDownLatch.await();
+        long end = System.currentTimeMillis();
+        System.out.println("==========cost " + (end - start));
     }
 
     @Test

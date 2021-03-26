@@ -25,7 +25,7 @@ public class LocalCacheProperties extends IdPropertiesBean {
      * 步长
      * 默认100
      */
-    @Max(value = 1000)
+    @Max(value = 10000)
     @Min(value = 100)
     private int stepNum = 100;
     /**

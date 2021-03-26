@@ -41,14 +41,14 @@ public abstract class AbstractWorkerId implements WorkerIdInterface {
 
     @Override
     public long getWorkerId(IdPropertiesBean idProperties, String systemCode) throws Exception {
+        if (Objects.nonNull(workerIdCache)) {
+            return workerIdCache;
+        }
         //  2021/3/8 扩展接口 自定义获取workerId方式
 //        如果有自定义的实现类 优先使用自定义实现类
         WorkerIdInterface workerIdInterface = SpiFactory.getObject(WorkerIdInterface.class);
         if (Objects.nonNull(workerIdInterface)) {
             return workerIdInterface.getWorkerId(idProperties, systemCode);
-        }
-        if (Objects.nonNull(workerIdCache)) {
-            return workerIdCache;
         }
         WorkIdStrategy workIdStrategy = idProperties.getWorkIdStrategy();
         if (Objects.nonNull(workIdStrategy.getIps())) {
