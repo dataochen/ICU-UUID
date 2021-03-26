@@ -1,7 +1,6 @@
 icu:
   uuid:
     local-cache:
-      everyMaxNo: 4223372036854775807
       work-id-strategy:
         maxWorkerIdNum: 2
         ips:
