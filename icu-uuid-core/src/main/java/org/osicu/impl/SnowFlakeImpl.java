@@ -40,11 +40,14 @@ public class SnowFlakeImpl extends AbstractWorkerId implements IdGenerateWrapInt
         int i2 = CommonUtil.bitUp(snowFlakeProperties.getWorkIdStrategy().getMaxWorkerIdNum());
         int maxWorkerIdNum = snowFlakeProperties.getWorkIdStrategy().getMaxWorkerIdNum();
         int maxTpsNum = snowFlakeProperties.getMaxTpsNum();
+        long startTime = snowFlakeProperties.getStartTime();
+        long time = System.currentTimeMillis() - startTime;
         LOGGER.info("可通过调节org.osicu.config.SnowFlakeProperties.maxTpsNum 和 org.osicu.config.WorkIdStrategy.maxWorkerIdNum 来控制ID范围。");
         LOGGER.info("当单台机器的每秒最大并发数为{}，最大机器数{}时", maxTpsNum, maxWorkerIdNum);
         for (int i = 0; i < 20; i++) {
-            int min = i * 365 * 24 * 3600 << (i1 + i2);
-            int max = (i + 1) * 365 * 24 * 3600 << (i1 + i2) | maxWorkerIdNum << i1 | maxTpsNum - 1;
+            long min = ((long) i * 365 * 24 * 3600) << (i1 + i2);
+            min += time;
+            long max = ((long) (i + 1) * 365 * 24 * 3600) << (i1 + i2) | maxWorkerIdNum << i1 | maxTpsNum - 1;
             LOGGER.info("第{}年 ID范围是{}~{} 长度范围是{}~{} ", i + 1, min, max, String.valueOf(min).length(), String.valueOf(max).length());
         }
 

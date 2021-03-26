@@ -34,6 +34,7 @@ public class IdGenerateFactory {
         IdGenerateWrapInterface idGenerateWrapInterface = SpiFactory.getObject(IdGenerateWrapInterface.class);
         if (Objects.nonNull(idGenerateWrapInterface)) {
             idGenerateWrapInterface.setIdConfigProperties(idConfigProperties);
+            idGenerateWrapInterface.checkParam();
             return idGenerateWrapInterface;
         }
         if (Objects.nonNull(snowFlake)) {

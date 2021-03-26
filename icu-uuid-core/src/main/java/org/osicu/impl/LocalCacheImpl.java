@@ -22,15 +22,18 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
     public static LocalCacheImpl newInstance(IdConfigProperties idConfigProperties) {
         LocalCacheImpl localCache = new LocalCacheImpl();
         localCache.setIdConfigProperties(idConfigProperties);
+
+
         return localCache;
     }
     private LocalCacheProperties localCacheProperties;
     private String systemCode;
+
     /**
      * 存储自增ID
      * 默认步长的2倍
      */
-    private ArrayBlockingQueue<Long> arrayBlockingQueue = new ArrayBlockingQueue<Long>(localCacheProperties.getStepNum() << 1);
+    private ArrayBlockingQueue<Long> arrayBlockingQueue;
 
     @Override
     public long nextId() throws Exception {
@@ -162,15 +165,12 @@ public class LocalCacheImpl extends AbstractWorkerId implements IdGenerateWrapIn
         return arrayBlockingQueue.size() <= localCacheProperties.getStepNum() * (1 - localCacheProperties.getThresholdValue());
     }
 
-    public static void main(String[] args) {
-        String s = Long.toHexString(1100);
-        System.out.println(s);
-    }
-
     @Override
     public void setIdConfigProperties(IdConfigProperties idConfigProperties) {
         this.localCacheProperties = idConfigProperties.getLocalCache();
         this.systemCode = idConfigProperties.getSystemCode();
+//            默认步长的2倍
+        this.arrayBlockingQueue = new ArrayBlockingQueue<Long>(localCacheProperties.getStepNum() << 1);
     }
 
     @Override

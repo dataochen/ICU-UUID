@@ -1,8 +1,9 @@
 icu:
   uuid:
-    snow-flake:
-      start-time: 0
+    local-cache:
+      everyMaxNo: 4223372036854775807
       work-id-strategy:
-        zk:
-          zk-address: 12
-    system-code: 
+        maxWorkerIdNum: 2
+        ips:
+          value: 10.13.144.110
+    system-code: demo

@@ -38,9 +38,10 @@ public class LocalCacheProperties extends IdPropertiesBean {
     private String basePath = "/export/Data/id/";
     /**
      * 每台机器支持的最大ID数量
+     * 默认 17179869184 1百亿多
      */
     @Min(1)
-    private long everyMaxNo;
+    private long everyMaxNo = 1L << 34;
 
     public String getBasePath() {
         return basePath;
@@ -82,7 +83,7 @@ public class LocalCacheProperties extends IdPropertiesBean {
         int maxWorkerIdNum = getWorkIdStrategy().getMaxWorkerIdNum();
 //        everyMaxNo+maxWorkerIdNum 是否超过Long类型的限制
         long maxNo = maxWorkerIdNum << CommonUtil.bitUp(everyMaxNo) | everyMaxNo;
-        if (maxNo < 0) {
+        if (maxNo < 0||CommonUtil.bitUp(everyMaxNo)==0) {
             throw new IllegalArgumentException("参数异常 everyMaxNo或maxWorkerIdNum 设置过大，已超过Long类型的限制，请合理设置大小。");
         }
         super.checkProperties();

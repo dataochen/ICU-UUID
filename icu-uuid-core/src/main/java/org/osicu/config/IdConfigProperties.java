@@ -106,7 +106,7 @@ public class IdConfigProperties {
         Set<ConstraintViolation<Object>> validate = validator.validate(object);
         // 抛出检验异常
         if (validate.size() > 0) {
-            String message = validate.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(","));
+            String message = validate.stream().map(x->x.getPropertyPath().toString()+x.getMessage()).collect(Collectors.joining(","));
             throw new IllegalArgumentException(message);
         }
     }

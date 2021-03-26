@@ -16,7 +16,8 @@ public interface IdGenerateWrapInterface extends IdGenerateInterface {
 
     /**
      * 检查配置参数
+     * @throws IllegalArgumentException 参数异常
      */
-    public void checkParam();
+    public void checkParam() throws IllegalArgumentException;
 
 }
